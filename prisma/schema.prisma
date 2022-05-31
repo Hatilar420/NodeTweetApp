@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  username  String @unique @db.VarChar(255)
+  password String
+  email   String   @unique @db.VarChar(255)
+  posts    Post[]
+  followersUsers Followers[] @relation(name: "followersUsers")
+  folllowingUsers Followers[] @relation(name: "followingUsers")    
+
+}
+
+model Post{
+
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  content   String
+  authorId Int
+  user User @relation(fields: [authorId], references: [id])
+}
+
+model Followers{
+  id Int @id @default(autoincrement())
+  followerId Int
+  followingId Int
+  following User @relation(name:"followingUsers",fields: [followingId],references: [id])
+  follower User @relation(name:"followersUsers",fields: [followerId],references: [id])
+}
+
